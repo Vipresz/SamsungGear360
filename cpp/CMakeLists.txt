@@ -166,6 +166,21 @@ if(NOT FFMPEG_FOUND)
 endif()
 
 # ============================================================================
+# Find OpenCV (optional, for improved lens center detection and alignment)
+# ============================================================================
+
+set(OPENCV_FOUND FALSE)
+find_package(OpenCV QUIET)
+if(OpenCV_FOUND)
+    set(OPENCV_FOUND TRUE)
+    message(STATUS "Found OpenCV: ${OpenCV_VERSION}")
+    add_definitions(-DHAVE_OPENCV)
+else()
+    message(STATUS "OpenCV not found - lens center detection will use geometric fallback")
+    message(STATUS "  Install OpenCV for improved alignment: brew install opencv (macOS) or apt-get install libopencv-dev (Linux)")
+endif()
+
+# ============================================================================
 # Find GLFW and GLEW
 # ============================================================================
 
@@ -279,7 +294,12 @@ endif()
 # ============================================================================
 
 add_executable(gear360_viewer
-    Gear360Viewer.cpp
+    main.cpp
+    config.cpp
+    shaders/shaders.cpp
+    renderer.cpp
+    video_decoder.cpp
+    stitching.cpp
 )
 
 # Include directories
@@ -299,6 +319,12 @@ target_link_libraries(gear360_viewer
     ${GLEW_LIB}
     OpenGL::GL
 )
+
+# Link OpenCV if available
+if(OPENCV_FOUND)
+    target_link_libraries(gear360_viewer ${OpenCV_LIBS})
+    target_include_directories(gear360_viewer PRIVATE ${OpenCV_INCLUDE_DIRS})
+endif()
 
 # macOS-specific frameworks
 if(APPLE)

@@ -31,6 +31,11 @@ ffplay -hide_banner -fflags nobuffer -flags low_delay -framedrop \
   -i "http://192.168.43.1:7679/livestream_high.avi"
 ```
 
+**Important:** To properly close the stream:
+- Press `q` to quit ffplay gracefully
+- Or press `Ctrl+C` to interrupt
+- **Always close properly** - if the stream remains connected, wait a few seconds or restart the camera
+
 ## Python Viewer
 
 **Location:** `python/gear360_viewer.py`

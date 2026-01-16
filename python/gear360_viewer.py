@@ -11,7 +11,7 @@ import time
 def main():
     parser = argparse.ArgumentParser(description='Gear360 Video Stream Viewer')
     parser.add_argument('url', nargs='?', 
-                       default='http://192.168.43.1:7680/livestream_high.avi',
+                       default='http://192.168.43.1:7679/livestream_high.avi',
                        help='Stream URL (default: http://192.168.43.1:7679/livestream_high.avi)')
     parser.add_argument('--fps', type=int, default=30,
                        help='Target FPS for display (default: 30)')
@@ -23,18 +23,31 @@ def main():
     print(f"Connecting to: {args.url}")
     print("Press 'q' or ESC to quit")
     
-    # Open video stream with low-latency options
-    cap = cv2.VideoCapture(args.url)
+    # Open video stream - use FFMPEG backend for MJPEG streams
+    # The stream is MJPEG format, not standard video container
+    cap = cv2.VideoCapture(args.url, cv2.CAP_FFMPEG)
     
     # Set low-latency options (similar to FFmpeg flags)
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)  # Minimal buffering
+    
+    # Try to open with explicit format hint for MJPEG
+    if not cap.isOpened():
+        # Retry with format specification
+        print("Retrying with MJPEG format hint...")
+        # OpenCV doesn't support format hints directly, but we can try
+        # using the backend parameter
+        cap = cv2.VideoCapture(args.url, cv2.CAP_FFMPEG)
+        cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
     
     if not cap.isOpened():
         print(f"Error: Could not open stream from {args.url}")
         print("\nTroubleshooting:")
         print("1. Make sure the Gear360 camera is connected and streaming")
-        print("2. Check that the URL is correct")
+        print("2. Check that the URL is correct (try port 7679)")
         print("3. Verify network connectivity")
+        print("4. Try: ffplay -i \"" + args.url + "\" to test the stream")
+        print("\nNote: This is an MJPEG stream. If OpenCV fails, use ffplay:")
+        print(f"  ffplay -hide_banner -fflags nobuffer -flags low_delay -framedrop -i \"{args.url}\"")
         return 1
     
     # Get stream properties
