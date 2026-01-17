@@ -218,7 +218,7 @@ else()
     # Manual search if pkg-config didn't find it
     if(NOT GLFW_LIB)
         find_library(GLFW_LIB 
-            NAMES glfw3 glfw
+            NAMES glfw3dll glfw3 glfw
             PATHS
             "C:/vcpkg/installed/x64-windows/lib"
             "C:/vcpkg/installed/x86-windows/lib"
@@ -236,7 +236,7 @@ else()
     
     if(NOT GLEW_LIB)
         find_library(GLEW_LIB 
-            NAMES GLEW glew
+            NAMES glew32 GLEW glew
             PATHS
             "C:/vcpkg/installed/x64-windows/lib"
             "C:/vcpkg/installed/x86-windows/lib"
