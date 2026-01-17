@@ -1,7 +1,5 @@
-"""
-Feature tracking for video-based dual-fisheye calibration.
-Tracks features across frames to estimate lens parameters from motion patterns.
-"""
+"""Feature tracking for video-based dual-fisheye calibration."""
+
 import cv2
 import numpy as np
 
@@ -14,7 +12,7 @@ class FeatureTracker:
                                    minDistance=min_distance, blockSize=7)
         self.lk_params = dict(winSize=(21, 21), maxLevel=3,
                               criteria=(cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.01))
-        self.tracks = {}  # track_id -> [(frame_idx, x, y, lens_id), ...]
+        self.tracks = {}
         self.next_id = 0
         self.prev_gray = None
         self.prev_pts = None
@@ -28,10 +26,8 @@ class FeatureTracker:
         lens_h = h if is_horizontal else h // 2
         
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY) if len(frame.shape) == 3 else frame
-        
         tracked_pts, tracked_ids = [], []
         
-        # Track existing features
         if self.prev_gray is not None and self.prev_pts is not None and len(self.prev_pts) > 0:
             next_pts, status, _ = cv2.calcOpticalFlowPyrLK(
                 self.prev_gray, gray, self.prev_pts, None, **self.lk_params)
@@ -47,7 +43,6 @@ class FeatureTracker:
                             tracked_pts.append([x, y])
                             tracked_ids.append(tid)
         
-        # Detect new features (excluding areas near existing tracks)
         from masks import make_feature_tracking_mask
         mask = make_feature_tracking_mask(gray, tracked_pts, min_distance=20)
         
@@ -74,11 +69,10 @@ class FeatureTracker:
 
 
 def estimate_distortion_from_tracks(tracks, lens_w, lens_h, center_x, center_y, lens_id):
-    """Estimate radial distortion from track motion patterns. Returns (p1, p2)."""
+    """Estimate radial distortion from track motion patterns."""
     cx, cy = center_x * lens_w, center_y * lens_h
     max_r = min(lens_w, lens_h) / 2
     
-    # Get center motion reference
     center_motions = []
     for pts in tracks.values():
         lens_pts = [(f, x, y) for f, x, y, lid in pts if lid == lens_id]
@@ -106,7 +100,6 @@ def estimate_distortion_from_tracks(tracks, lens_w, lens_h, center_x, center_y, 
     if avg_mag < 3:
         return 0.0, 0.0
     
-    # Compare inner vs outer motion
     deviations = []
     for pts in tracks.values():
         lens_pts = [(f, x, y) for f, x, y, lid in pts if lid == lens_id]
@@ -142,7 +135,7 @@ def estimate_distortion_from_tracks(tracks, lens_w, lens_h, center_x, center_y, 
 
 
 def estimate_rotation_from_tracks(tracks, lens_w, lens_h):
-    """Estimate relative rotation from track motion. Returns (yaw, pitch, roll)."""
+    """Estimate relative rotation from track motion."""
     motions = {0: [], 1: []}
     
     for pts in tracks.values():
