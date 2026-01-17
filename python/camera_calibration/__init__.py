@@ -1,71 +1,44 @@
 """
 Camera Calibration Package for Dual-Fisheye 360° Cameras
 
-Modules:
-- projection: Fisheye to equirectangular projection
-- lens_detection: Lens boundary and center detection
-- masks: Overlap region masking utilities
-- tracking: Video-based feature tracking for calibration
-- least_squares_stitch: Spherical least-squares calibration
+Subpackages:
+- calib: Calibration configuration and creation
+- projections: Fisheye to equirectangular projection
+- solvers: Calibration optimization solvers
 
 Usage:
-    from camera_calibration import project_fisheye_to_equirectangular
-    from camera_calibration.lens_detection import detect_lens_center
+    from camera_calibration.calib import CameraCalibration, LensCalibration
+    from camera_calibration.projections import fisheye_to_equirect_calibrated
+    from camera_calibration.solvers import calibrate_joint
 """
 
-from .projection import (
-    fisheye_to_equirect_half,
-    fisheye_to_equirect_dual,
-    project_fisheye_to_equirectangular,
-    apply_calibration_to_video,
-    LENS_FOV_DEG,
-    THETA_MAX
-)
-
-from .lens_detection import (
-    detect_lens_center_advanced,
-    detect_lens_center,
-    detect_boundary_points,
-    fit_circle_ransac
-)
-
-from .masks import (
+from .calib.calibration_config import CameraCalibration, LensCalibration
+from .calib.masks import (
     make_ring_mask,
     make_overlap_ring_mask,
     extract_ring_region,
     make_feature_tracking_mask
 )
-
-from .tracking import (
+from .projections.fisheye_to_equirect import (
+    fisheye_to_equirect_calibrated,
+    mask_fisheye_circle,
+    blend_dual_patches
+)
+from .solvers.tracking import (
     FeatureTracker,
     estimate_rotation_from_tracks,
     estimate_distortion_from_tracks
 )
 
-from .least_squares_stitch import (
-    FisheyeParams,
-    collect_matches,
-    calibrate,
-    compute_angular_errors,
-    filter_outliers,
-    effective_fov
-)
-
 __version__ = '1.0.0'
 __all__ = [
-    # Projection
-    'fisheye_to_equirect_half', 'fisheye_to_equirect_dual',
-    'project_fisheye_to_equirectangular', 'apply_calibration_to_video',
-    'LENS_FOV_DEG', 'THETA_MAX',
-    # Lens detection
-    'detect_lens_center_advanced', 'detect_lens_center',
-    'detect_boundary_points', 'fit_circle_ransac',
+    # Calibration config
+    'CameraCalibration', 'LensCalibration',
     # Masks
     'make_ring_mask', 'make_overlap_ring_mask', 
     'extract_ring_region', 'make_feature_tracking_mask',
+    # Projection
+    'fisheye_to_equirect_calibrated', 'mask_fisheye_circle', 'blend_dual_patches',
     # Tracking
     'FeatureTracker', 'estimate_rotation_from_tracks', 'estimate_distortion_from_tracks',
-    # Least-squares
-    'FisheyeParams', 'collect_matches', 'calibrate', 
-    'compute_angular_errors', 'filter_outliers', 'effective_fov'
 ]

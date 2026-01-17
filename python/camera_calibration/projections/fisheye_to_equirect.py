@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 import cv2
 import numpy as np
-from calibration_config import CameraCalibration, LensCalibration
+from camera_calibration.calib.calibration_config import CameraCalibration, LensCalibration
 
 
 def mask_fisheye_circle(img, margin=0):
