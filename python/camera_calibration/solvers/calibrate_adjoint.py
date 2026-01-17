@@ -10,8 +10,8 @@ import sys
 import cv2
 import numpy as np
 from scipy.optimize import minimize
-from calibration_config import CameraCalibration, LensCalibration
-from fisheye_to_equirect import (
+from camera_calibration.calib.calibration_config import CameraCalibration, LensCalibration
+from camera_calibration.projections.fisheye_to_equirect import (
     fisheye_to_equirect_calibrated,
     mask_fisheye_circle,
     blend_dual_patches
