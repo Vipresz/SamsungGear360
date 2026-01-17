@@ -88,6 +88,13 @@ struct StitchParams {
 // Load calibration from TOML file
 bool loadCalibrationFromFile(const std::string& filename);
 
+// Reload calibration from the stored path
+bool reloadCalibration();
+
+// Set/get calibration file path
+void setCalibrationFilePath(const std::string& path);
+const std::string& getCalibrationFilePath();
+
 // Global instances
 extern Options g_options;
 extern FrameData g_frameData;

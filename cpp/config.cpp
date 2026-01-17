@@ -10,6 +10,26 @@ std::atomic<bool> g_running(true);
 std::atomic<AVFormatContext*> g_formatContext(nullptr);
 StitchParams g_stitchParams;
 
+// Store calibration file path for reload
+static std::string g_calibrationFilePath;
+
+void setCalibrationFilePath(const std::string& path) {
+    g_calibrationFilePath = path;
+}
+
+const std::string& getCalibrationFilePath() {
+    return g_calibrationFilePath;
+}
+
+bool reloadCalibration() {
+    if (g_calibrationFilePath.empty()) {
+        std::cerr << "No calibration file path set" << std::endl;
+        return false;
+    }
+    std::cout << "\n=== Reloading calibration ===" << std::endl;
+    return loadCalibrationFromFile(g_calibrationFilePath);
+}
+
 // Signal handler for graceful shutdown
 void signalHandler(int signal) {
     std::cout << "\nReceived signal " << signal << ", shutting down gracefully..." << std::endl;
