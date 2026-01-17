@@ -1,0 +1,24 @@
+# Python
+*.pyc
+__pycache__/
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environment
+.venv/
+venv/
+pyvenv.cfg
+lib/
+bin/
+include/
+
+# Generated output files
+image.png
+image2.png
+*.mp4
+
+# IDE
+.idea/
+.vscode/
