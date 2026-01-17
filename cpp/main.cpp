@@ -86,6 +86,7 @@ int main(int argc, char* argv[]) {
     
     // Load calibration file if specified
     if (!calibrationFile.empty()) {
+        setCalibrationFilePath(calibrationFile);
         if (loadCalibrationFromFile(calibrationFile)) {
             // If calibration is loaded, enable equirectangular mode automatically
             if (!g_options.equirectangularMode && !g_options.rectilinearMode) {
@@ -95,6 +96,9 @@ int main(int argc, char* argv[]) {
         } else {
             std::cerr << "Warning: Failed to load calibration file, using defaults" << std::endl;
         }
+    } else {
+        // Default calibration file path for reload functionality
+        setCalibrationFilePath("calibration.toml");
     }
     
     // If rectilinear or equirectangular is enabled but FOV not specified, use default 195
@@ -103,6 +107,7 @@ int main(int argc, char* argv[]) {
     }
     
     std::cout << "Gear360 Viewer - Connecting to: " << g_options.url << std::endl;
+    std::cout << "Press 'R' to reload calibration from: " << getCalibrationFilePath() << std::endl;
     if (g_options.rectilinearMode) {
         std::cout << "Rectilinear mode: ENABLED (FOV: " << g_options.fov << " degrees)" << std::endl;
     } else if (g_options.equirectangularMode) {
@@ -167,6 +172,17 @@ int main(int argc, char* argv[]) {
         
         if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, GLFW_TRUE);
+        }
+        
+        // Reload calibration on 'R' key press
+        static bool rKeyWasPressed = false;
+        if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+            if (!rKeyWasPressed) {
+                rKeyWasPressed = true;
+                reloadCalibration();
+            }
+        } else {
+            rKeyWasPressed = false;
         }
         
         // Update texture if new frame available
