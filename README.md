@@ -1,83 +1,55 @@
-# Gear360 Viewer
+# Samsung Gear360 Viewer & Calibration
 
-View live video streams from Gear360 camera.
+A comprehensive toolset for streaming and viewing 360° video from Samsung Gear360 cameras, with advanced lens calibration capabilities for high-quality dual-fisheye stitching.
 
-**Default Stream URL:** `http://192.168.43.1:7679/livestream_high.avi`
+## Overview
+
+This project provides tools to:
+- **Stream live 360° video** from Samsung Gear360 cameras over WiFi
+- **Calibrate dual-fisheye lenses** to optimize stitching quality
+- **Project and view** dual-fisheye footage as equirectangular 360° video
+- **Real-time rendering** with OpenGL for smooth playback
+
+## Components
+
+### Python Tools (`python/`)
+- **Simple viewer**: Quick video stream viewer using OpenCV
+- **Calibration tools**: Advanced lens calibration with joint and stepwise optimizers
+- **Projection utilities**: Convert dual-fisheye images to equirectangular format
+
+### C++ Viewer (`cpp/`)
+- **High-performance viewer**: OpenGL-based real-time video rendering
+- **Multiple projection modes**: Raw, rectilinear, and equirectangular views
+- **Calibration support**: Load and hot-reload lens calibration parameters
+- **Real-time stitching**: Automatic dual-lens alignment and blending
 
 ## Quick Start
 
-### Python (Recommended - Easiest)
-
+### Python Viewer (Easiest)
 ```bash
 cd python
 pip install opencv-python numpy
 python gear360_viewer.py
 ```
 
-### C++
-
+### C++ Viewer (Best Performance)
 ```bash
 cd cpp
-mkdir build && cd build
-cmake ..
-cmake --build .
-./bin/gear360_viewer
+# See cpp/README.md for platform-specific build instructions
 ```
 
-### Command Line (FFmpeg)
-
+### Calibration
 ```bash
-ffplay -hide_banner -fflags nobuffer -flags low_delay -framedrop \
-  -i "http://192.168.43.1:7679/livestream_high.avi"
+cd python
+python -m camera_calibration.solvers.calibrate_adjoint \
+    --video input.mp4 --output_image output.png --fov 180
 ```
 
-**Important:** To properly close the stream:
-- Press `q` to quit ffplay gracefully
-- Or press `Ctrl+C` to interrupt
-- **Always close properly** - if the stream remains connected, wait a few seconds or restart the camera
+## Default Stream URL
 
-## Python Viewer
+`http://192.168.43.1:7679/livestream_high.avi`
 
-**Location:** `python/gear360_viewer.py`
+## Documentation
 
-**Install:**
-```bash
-pip install -r python/requirements.txt
-```
-
-**Usage:**
-```bash
-python python/gear360_viewer.py [url] [--fps 30] [--scale 0.5]
-```
-
-**Controls:** Press `q` or `ESC` to quit
-
-## C++ Viewer
-
-**Location:** `cpp/`
-
-**Dependencies (macOS):**
-```bash
-brew install ffmpeg glfw glew
-```
-
-**Build:**
-```bash
-cd cpp
-mkdir build && cd build
-cmake ..
-cmake --build .
-```
-
-**Run:**
-```bash
-./bin/gear360_viewer [url]
-```
-
-**Controls:** Press `ESC` to quit
-
-## Troubleshooting
-
-- **Stream won't connect:** Verify camera is streaming and URL is correct
-- **Python errors:** Ensure OpenCV is installed: `pip install opencv-python`
-- **C++ build fails:** Install dependencies via Homebrew (see above)
+- **C++ Viewer**: See [`cpp/README.md`](cpp/README.md) for build instructions, features, and usage
+- **Python Tools**: See [`python/README.md`](python/README.md) for calibration and projection tools
