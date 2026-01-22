@@ -13,10 +13,12 @@ pyvenv.cfg
 lib/
 bin/
 include/
+share/
 
-# Generated output files
+# Generated output files (temporary)
 image.png
 image2.png
+out.png
 *.mp4
 
 # IDE
