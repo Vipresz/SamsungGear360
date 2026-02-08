@@ -35,21 +35,17 @@ void printUsage(const char* programName) {
     std::cout << "  " << programName << " --equirectangular --calibration calibration.toml  # Use calibration file" << std::endl;
 }
 
-int main(int argc, char* argv[]) {
-    // Set up signal handlers for graceful shutdown
-    signal(SIGINT, signalHandler);
-    signal(SIGTERM, signalHandler);
-    
-    // Default URL (port 7679 based on ffplay working example)
+// Parse command-line arguments and configure global options
+// Returns: 0 = success, 1 = error, -1 = should exit (e.g., --help)
+int parseArguments(int argc, char* argv[]) {
     g_options.url = "http://192.168.43.1:7679/livestream_high.avi";
     bool fovSpecified = false;
     std::string calibrationFile = "";
     
-    // Parse command-line arguments
     for (int i = 1; i < argc; i++) {
         if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {
             printUsage(argv[0]);
-            return 0;
+            return -1;
         } else if (strcmp(argv[i], "--rectilinear") == 0) {
             g_options.rectilinearMode = true;
         } else if (strcmp(argv[i], "--equirectangular") == 0) {
@@ -75,6 +71,8 @@ int main(int argc, char* argv[]) {
                 std::cerr << "Error: --calibration requires a file path" << std::endl;
                 return 1;
             }
+        } else if (strcmp(argv[i], "--light-falloff") == 0) {
+            g_options.enableLightFalloffCompensation = true;
         } else if (argv[i][0] != '-') {
             g_options.url = argv[i];
         } else {
@@ -106,6 +104,10 @@ int main(int argc, char* argv[]) {
         g_options.fov = 195.0f;
     }
     
+    return 0;
+}
+
+void printStartupInfo() {
     std::cout << "Gear360 Viewer - Connecting to: " << g_options.url << std::endl;
     std::cout << "Press 'R' to reload calibration from: " << getCalibrationFilePath() << std::endl;
     if (g_options.rectilinearMode) {
@@ -120,8 +122,25 @@ int main(int argc, char* argv[]) {
         std::cout << "Display mode: Raw equirectangular video" << std::endl;
     }
     if (g_options.stitchMode && g_options.equirectangularMode) {
-        std::cout << "Stitch mode: ENABLED (analyzing first " << g_options.stitchFrames << " frames)" << std::endl;
+        std::cout << "Stitch mode: ENABLED" << std::endl;
     }
+    if (g_options.enableLightFalloffCompensation) {
+        std::cout << "Light falloff compensation: ENABLED" << std::endl;
+    }
+}
+
+int main(int argc, char* argv[]) {
+    // Set up signal handlers for graceful shutdown
+    signal(SIGINT, signalHandler);
+    signal(SIGTERM, signalHandler);
+    
+    // Parse command-line arguments
+    int parseResult = parseArguments(argc, argv);
+    if (parseResult != 0) {
+        return (parseResult == -1) ? 0 : parseResult;  // -1 means --help, exit cleanly
+    }
+    
+    printStartupInfo();
     
     // Initialize GLFW
     if (!glfwInit()) {

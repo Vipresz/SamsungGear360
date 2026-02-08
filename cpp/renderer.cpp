@@ -3,7 +3,6 @@
 #include "shaders/shaders.h"
 #include <iostream>
 #include <vector>
-#include <mutex>
 
 GLuint g_texture = 0;
 GLuint g_VAO = 0;
@@ -56,15 +55,8 @@ void updateTexture(const std::vector<uint8_t>& data, int width, int height) {
     
     glBindTexture(GL_TEXTURE_2D, g_texture);
     
-    // Convert BGR to RGB
-    std::vector<uint8_t> rgbData(data.size());
-    for (size_t i = 0; i < data.size(); i += 3) {
-        rgbData[i] = data[i + 2];
-        rgbData[i + 1] = data[i + 1];
-        rgbData[i + 2] = data[i];
-    }
-    
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgbData.data());
+    // Upload BGR data directly - conversion to RGB is done in the shader
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data.data());
 }
 
 void renderFrame() {

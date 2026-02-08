@@ -17,9 +17,7 @@ struct Options {
     bool equirectangularMode = false;  // Enable equirectangular projection
     float fov = 195.0f;  // FOV in degrees (used when rectilinear or equirectangular is enabled)
     bool stitchMode = false;
-    int stitchFrames = 10;  // Number of frames to analyze for stitching (legacy, not used)
     bool enableLightFalloffCompensation = false;  // Enable vignetting compensation
-    bool enableRefineAlignment = false;  // Enable NCC-based alignment refinement
 };
 
 // Global state
@@ -47,9 +45,9 @@ struct StitchParams {
     int lensHeight = 0;
     
     // Alignment refinement offsets (lens-local normalized UV [0,1])
-    float alignmentOffset1X = 0.0f;  // Offset for lens 1 (lens-local normalized)
+    float alignmentOffset1X = 0.0f;  // Offset for lens 1
     float alignmentOffset1Y = 0.0f;
-    float alignmentOffset2X = 0.0f;  // Offset for lens 2 (lens-local normalized)
+    float alignmentOffset2X = 0.0f;  // Offset for lens 2
     float alignmentOffset2Y = 0.0f;
     
     // FOV scaling per lens (1.0 = 180°, typical value ~1.08 for 195° lens)
@@ -68,7 +66,7 @@ struct StitchParams {
     float lens2RotationPitch = 0.0f;
     float lens2RotationRoll = 0.0f;
     
-    // Legacy single rotation (average, for backward compatibility)
+    // Global rotation (used when per-lens values not specified)
     float rotationYaw = 0.0f;    // Rotation around vertical axis
     float rotationPitch = 0.0f;  // Rotation around horizontal axis
     float rotationRoll = 0.0f;   // Rotation around optical axis
@@ -76,12 +74,7 @@ struct StitchParams {
     // Whether calibration was loaded from file
     bool fromCalibrationFile = false;
     
-    // Frame collection for stitching analysis
-    std::vector<std::vector<uint8_t>> collectedFrames;
-    std::vector<std::pair<int, int>> frameDimensions;  // width, height pairs
-    std::chrono::steady_clock::time_point firstFrameTime;
-    std::chrono::steady_clock::time_point lastCollectionTime;
-    int framesCollected = 0;
+    // Track if first frame has been analyzed
     bool firstFrameCollected = false;
 };
 

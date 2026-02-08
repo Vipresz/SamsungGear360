@@ -166,10 +166,10 @@ vec4 fisheyeToEquirectangularWithStitching(vec2 uv, float fov) {
         vec4 colorR = vec4(0.0);
         
         if (validL) {
-            colorL = texture(ourTexture, uvL);
+            colorL = sampleTextureBGR(uvL);
         }
         if (validR) {
-            colorR = texture(ourTexture, uvR);
+            colorR = sampleTextureBGR(uvR);
         }
         
         // Calculate distances from lens centers in lens-local pixel space
@@ -333,7 +333,7 @@ vec4 fisheyeToEquirectangularWithStitching(vec2 uv, float fov) {
             return vec4(0.0, 0.0, 0.0, 0.0);  // Invalid UV - return transparent
         }
         
-        vec4 colorL = texture(ourTexture, uvL);
+        vec4 colorL = sampleTextureBGR(uvL);
         
         // Apply circular crop if enabled
         if (uEnableCircularCrop) {
@@ -353,7 +353,7 @@ vec4 fisheyeToEquirectangularWithStitching(vec2 uv, float fov) {
             return vec4(0.0, 0.0, 0.0, 0.0);  // Invalid UV - return transparent
         }
         
-        vec4 colorR = texture(ourTexture, uvR);
+        vec4 colorR = sampleTextureBGR(uvR);
         
         // Apply circular crop if enabled
         if (uEnableCircularCrop) {

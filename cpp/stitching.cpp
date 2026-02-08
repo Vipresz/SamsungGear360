@@ -423,12 +423,15 @@ bool computeAlignmentOffsets(const std::vector<uint8_t>& data, int width, int he
         return true;
     }
 #endif
-    
-    // Final fallback: try simple method even if OpenCV failed
+
+#ifdef HAVE_OPENCV
+    // OpenCV template matching failed, try simple method as fallback
+    std::cout << "  OpenCV matching failed, trying simple fallback..." << std::endl;
     if (computeAlignmentOffsetsSimple(data, width, height, lensW, lensH, isHorizontal,
                                      offset1X, offset1Y, offset2X, offset2Y)) {
         return true;
     }
+#endif
     
     // No alignment computed
     offset1X = 0.0f;
@@ -564,33 +567,7 @@ void analyzeFrameForStitchingImmediate(const std::vector<uint8_t>& data, int wid
     g_stitchParams.calibrated = true;
 }
 
-// Simplified stitching initialization based on image dimensions
-// Uses the first frame from collected frames
-void analyzeCollectedFramesForStitching() {
-    if (g_stitchParams.collectedFrames.empty()) {
-        std::cerr << "Warning: No frames collected for stitching analysis" << std::endl;
-        return;
-    }
-    
-    // Use the first frame to determine parameters
-    const auto& firstFrame = g_stitchParams.collectedFrames[0];
-    int width = g_stitchParams.frameDimensions[0].first;
-    int height = g_stitchParams.frameDimensions[0].second;
-    
-    // Delegate to the immediate analysis function
-    analyzeFrameForStitchingImmediate(firstFrame, width, height);
-}
-
-// Simplified alignment refinement - no-op for now
-// Can be enhanced later with template matching if needed
-void refineAlignmentFromCollectedFrames() {
-    // Alignment refinement is handled in the shader through uniform offsets
-    // For now, we use zero offsets (no refinement)
-    // This can be enhanced later with template matching similar to FisheyeStitcher::findMatchLoc
-    std::cout << "Alignment refinement: Using default offsets (0, 0)" << std::endl;
-}
-
-// Simplified frame alignment computation - delegates to computeAlignmentOffsets
+// Compute frame alignment offsets - delegates to computeAlignmentOffsets
 bool computeFrameAlignment(const std::vector<uint8_t>& data, int width, int height,
                           float& offset1X, float& offset1Y, float& offset2X, float& offset2Y) {
     // Determine layout
@@ -600,10 +577,4 @@ bool computeFrameAlignment(const std::vector<uint8_t>& data, int width, int heig
     
     return computeAlignmentOffsets(data, width, height, lensW, lensH, isHorizontal,
                                    offset1X, offset1Y, offset2X, offset2Y);
-}
-
-// Legacy function - kept for compatibility but simplified
-void analyzeFrameForStitching(const std::vector<uint8_t>& data, int width, int height) {
-    // Delegate to the immediate analysis function
-    analyzeFrameForStitchingImmediate(data, width, height);
 }

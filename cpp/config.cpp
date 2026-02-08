@@ -31,16 +31,10 @@ bool reloadCalibration() {
 }
 
 // Signal handler for graceful shutdown
-void signalHandler(int signal) {
-    std::cout << "\nReceived signal " << signal << ", shutting down gracefully..." << std::endl;
+// Note: Only async-signal-safe operations should be performed here.
+// We just set the flag; cleanup happens in the main thread.
+void signalHandler(int /* signal */) {
     g_running = false;
-    
-    // Force close the format context if it exists
-    AVFormatContext* fmt = g_formatContext.load();
-    if (fmt) {
-        avformat_close_input(&fmt);
-        g_formatContext.store(nullptr);
-    }
 }
 
 // Load calibration parameters from TOML file

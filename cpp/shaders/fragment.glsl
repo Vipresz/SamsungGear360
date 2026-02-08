@@ -14,7 +14,7 @@ void main() {
         vec2 equirectUV = fisheyeToEquirectangular(uv, uFOV);
         vec4 fallbackColor = vec4(0.0, 0.0, 0.0, 1.0);
         if (equirectUV.x >= 0.0 && equirectUV.x <= 1.0 && equirectUV.y >= 0.0 && equirectUV.y <= 1.0) {
-            fallbackColor = texture(ourTexture, equirectUV);
+            fallbackColor = sampleTextureBGR(equirectUV);
         }
         
         // Only use stitching if parameters are valid
@@ -39,12 +39,12 @@ void main() {
         
         // Check for valid UV coordinates
         if (rectUV.x >= 0.0 && rectUV.x <= 1.0 && rectUV.y >= 0.0 && rectUV.y <= 1.0) {
-            FragColor = texture(ourTexture, rectUV);
+            FragColor = sampleTextureBGR(rectUV);
         } else {
             FragColor = vec4(0.0, 0.0, 0.0, 1.0);  // Black outside FOV or invalid
         }
     } else {
         // Default mode: display raw equirectangular video
-        FragColor = texture(ourTexture, uv);
+        FragColor = sampleTextureBGR(uv);
     }
 }

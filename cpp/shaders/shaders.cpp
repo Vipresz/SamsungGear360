@@ -113,7 +113,8 @@ in vec2 TexCoord;
 out vec4 FragColor;
 uniform sampler2D ourTexture;
 void main() {
-    FragColor = texture(ourTexture, TexCoord);
+    vec4 c = texture(ourTexture, TexCoord);
+    FragColor = vec4(c.b, c.g, c.r, c.a);  // BGR to RGB
 }
 )";
         }
